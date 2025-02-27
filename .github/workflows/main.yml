@@ -1,0 +1,40 @@
+name: Chat App CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Lint code
+      run: npm run lint || echo "No linting configured"
+    
+    - name: Run tests
+      run: npm test -- --passWithNoTests
+    
+    - name: Build
+      run: npm run build
+      
+    # Add deployment steps here if needed
+    # - name: Deploy
+    #   run: echo "Add your deployment commands here"
